@@ -23,13 +23,15 @@ class LocationViewModel: ObservableObject {
     
     @Published var showLocationsList: Bool = false
     
+    @Published var sheetLocation: Location? = nil
+    
     init() {
         let locations = LocationsDataService.locations
         self.locations = locations
         self.mapLocation = locations.first!
         self.updateMapRegion(location: locations.first!)
     }
-
+    
     func toggleLocationsList() {
         withAnimation(.easeInOut) {
             showLocationsList = !showLocationsList
@@ -41,6 +43,21 @@ class LocationViewModel: ObservableObject {
             mapLocation = location
             showLocationsList = false
         }
+    }
+    
+    func nextButtonPressed() {
+        
+        guard let currentIndex = locations.firstIndex(where: { $0 == mapLocation }) else { return }
+        let nextIndex = currentIndex + 1
+        
+        guard locations.indices.contains(nextIndex) else {
+            guard let firstLocation = locations.first else { return }
+            showNextLocation(location: firstLocation)
+            return
+        }
+
+        let nextLocation = locations[nextIndex]
+        showNextLocation(location: nextLocation)
     }
     
     private func updateMapRegion(location: Location) {
